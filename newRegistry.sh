@@ -1,17 +1,23 @@
 #!/bin/bash
 CURRENT_DIR=`pwd`
 
-#build new directory
 mkdir -p certs 
-SOURCE_DIR=$CURRENT_DIR/certs
 
-#common name should be test.wso2.com.crt
 # get certificate 
-openssl req -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key -x509 -days 365 -out certs/domain.crt
+echo 'Common Name for the certificate should be the Host name'
+#openssl req -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key -x509 -days 365 -out certs/domain.crt
 echo 'Successfully created a certificate'
 
+echo 'Enter the port that you want to map the container port'
+read port
+echo 'Enter the port that you want to map the host port'
+read host
+echo 'Enter the storage path e.g. :- `pwd`/certs:/certs'
+read path
+echo 'Enter the name for the Registry'
+read name
 #run the docker registry with TLS enabled
-sudo docker run -d -p 5000:5000 --restart=always --name registry -v `pwd`/certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry:2
+sudo docker run -d -p $host:$port --restart=always --name $name -v $path -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry:2
 
 
 
